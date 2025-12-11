@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'login_screen.dart';
 import 'passagem_screen.dart';
 import 'os_terceiros_screen.dart';
 import 'coleta_screen.dart';
@@ -44,11 +46,26 @@ class _HomeScreenState extends State<HomeScreen> {
     const _MenuItem('Sair do Aplicativo', Icons.close, '/sair'),
   ];
 
+  void _logout() {
+    // Em web ou desktop, volta para a tela de login; mobile fecha o app.
+    final isDesktop = defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.linux;
+
+    if (kIsWeb || isDesktop) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    } else {
+      SystemNavigator.pop();
+    }
+  }
+
   void _onSelectItem(int index) {
     final item = _items[index];
     if (item.route == '/sair') {
-      // Exit the app
-      SystemNavigator.pop();
+      _logout();
       return;
     }
     // Navigate to the matching screen
@@ -220,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       backgroundColor: Colors.redAccent),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    SystemNavigator.pop();
+                    _logout();
                   },
                   child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
